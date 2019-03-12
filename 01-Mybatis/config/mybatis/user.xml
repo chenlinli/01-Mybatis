@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：用于隔离sql语句，后续有重要作用 -->
+<mapper namespace="user">
+	<!-- id是sql语句的唯一标识,
+	parameterType:入参的类型，
+	resultType：返回结果的数据类型 
+	#{}：占位符，相当于jdbc的“？”
+	-->
+	<select id="getUserById" parameterType="int" resultType="com.cl.mybatis.pojo.User">
+		select * 
+		from user 
+		where id=#{id2}
+	</select>
+	
+	<!-- resultType：返回结果为集合，时许设置一个数据类型 
+	${}是字符串拼接，普通类型：int,string,{}里只能写value-->
+	<select id="getUserByUsername" parameterType="string" resultType="com.cl.mybatis.pojo.User">
+		select * 
+		from user 
+		<!-- where username like #{name} -->
+		where username like '%${value}%'
+	</select>
+	
+	<!-- 入参：pojo -->
+	<!-- useGeneratedKeys:启动自增，配套使用keyProperty
+	keyProperty：用user的哪个属性接收 -->
+	<insert id="insertUser" parameterType="com.cl.mybatis.pojo.User" useGeneratedKeys="true" keyProperty="id">
+		<!-- selectKey：主键返回
+		keyProperty：user的主键属性
+		resultType：主键类型
+		order=AFTER/BEFORE:在sql插入后/前执行函数，把查到的id注入user的id属性 -->
+		<!-- <selectKey keyProperty="id" resultType="int" order="AFTER">
+			select LAST_INSERT_ID()
+		</selectKey> -->
+		insert into user(username,birthday,sex,address)
+ 		values(#{username},#{birthday},#{sex},#{address});
+	</insert>
+	
+	<!-- useGeneratedKeys:自增不生效 -->
+	<insert id="insertUserUuid" parameterType="com.cl.mybatis.pojo.User" useGeneratedKeys="true" keyProperty="id">
+		<selectKey keyProperty="uuid2" resultType="string" order="BEFORE">
+			select UUID();
+		</selectKey>
+		insert into user(username,birthday,sex,address,uuid2)
+ 		values(#{username},#{birthday},#{sex},#{address},#{uuid2});
+	</insert>
+	
+	<update id="updateUser" parameterType="com.cl.mybatis.pojo.User" >
+		update user set username = #{username}
+		where id=#{id};
+	</update>
+	
+	<!-- 删除用户 -->
+	<delete id="deleteUser" parameterType="int">
+		delete from user
+		where id=#{id}
+	</delete>
+</mapper>
